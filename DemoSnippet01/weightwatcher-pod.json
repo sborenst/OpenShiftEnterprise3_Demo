@@ -1,0 +1,21 @@
+{
+  "id": "weightwatcher-pod",
+  "kind": "Pod",
+  "apiVersion":"v1beta2",
+  "labels": {
+    "name": "weightwatcher-singlesadpod"
+  },
+  "desiredState": {
+    "manifest": {
+      "version": "v1beta1",
+      "id": "weightwatcher-singlesadpod",
+      "containers": [{
+        "name": "weightwatcher-singlesadpod",
+        "image": "spicozzi/weightwatcher",
+        "ports": [{
+          "containerPort": 8080
+        }]
+      }]
+    }
+  }
+} 

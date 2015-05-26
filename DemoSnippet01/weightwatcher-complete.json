@@ -1,0 +1,97 @@
+{
+  "metadata":{
+    "name":"weightwatcher-meta"
+  },
+  "kind":"Config",
+  "apiVersion":"v1beta1",
+  "creationTimestamp":"2014-09-18T18:28:38-04:00",
+  "items":[
+    {
+      "id": "weightwatcher-service",
+      "kind": "Service",
+      "apiVersion": "v1beta1",
+      "port": 3030,
+      "containerPort": 8080,
+      "selector": {
+        "name": "weightwatcher"
+      }
+    },
+    {
+      "kind": "Route",
+      "apiVersion": "v1beta1",
+      "metadata": {
+        "name": "weightwatcher-route"
+      },
+      "id": "weightwatcher-route",
+      "host": "weightwatcher.cloudapps-GUID.oslab.opentlc.com",
+      "serviceName": "weightwatcher-service"
+    },
+    {
+        "kind": "DeploymentConfig",
+        "apiVersion": "v1beta1",
+        "metadata": {
+            "name": "weightwatcher"
+        },
+        "triggers": [
+            {
+              "imageChangeParams": {
+                "automatic": true,
+                "containerNames": [
+                  "weightwatcher"
+                ],
+                "from": {
+                  "name": "weightwatcher"
+                },
+                "tag": "latest"
+              },
+              "type": "ImageChange"
+            }
+        ],
+        "template": {
+            "strategy": {
+                "type": "Recreate"
+            },
+            "controllerTemplate": {
+                "replicas": 1,
+                "replicaSelector": {
+                    "name": "weightwatcher"
+                },
+                "podTemplate": {
+                    "desiredState": {
+                        "manifest": {
+                            "version": "v1beta2",
+                            "id": "weightwatcher",
+                            "volumes": null,
+                            "containers": [
+                                {
+                                    "name": "weightwatcher",
+                                    "image": "spicozzi/weightwatcher",
+                                    "ports": [
+                                        {
+                                        	 "containerPort": 8080,
+                                        	   "protocol": "TCP"
+                                                              }
+                                    ],
+                                    "resources": {},
+                                    "terminationMessagePath": "/dev/termination-log",
+                                    "imagePullPolicy": "PullIfNotPresent",
+                                    "capabilities": {}
+                                }
+                            ],
+                            "restartPolicy": {
+                                "always": {}
+                            },
+                            "dnsPolicy": "ClusterFirst"
+                        }
+                    },
+                    
+                    "labels": {
+                        "name": "weightwatcher"
+                    }
+                }
+            }
+        },
+        "latestVersion": 1
+    }
+  ]
+}

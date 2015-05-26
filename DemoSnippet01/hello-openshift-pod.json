@@ -1,0 +1,21 @@
+{
+  "id": "hello-openshift-pod",
+  "kind": "Pod",
+  "apiVersion":"v1beta2",
+  "labels": {
+    "name": "hello-openshift-singlesadpod"
+  },
+  "desiredState": {
+    "manifest": {
+      "version": "v1beta1",
+      "id": "hello-openshift-singlesadpod",
+      "containers": [{
+        "name": "hello-openshift-singlesadpod",
+        "image": "openshift/hello-openshift",
+        "ports": [{
+          "containerPort": 8080
+        }]
+      }]
+    }
+  }
+} 

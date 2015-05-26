@@ -1,0 +1,10 @@
+{
+  "kind": "Route",
+  "apiVersion": "v1beta1",
+  "metadata": {
+    "name": "simplerubyapp-route"
+  },
+  "id": "simplerubyapp-route",
+  "host": "simplerubyapp.cloudapps-GUID.oslab.opentlc.com",
+  "serviceName": "simplerubyapp"
+}
