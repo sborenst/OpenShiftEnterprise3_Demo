@@ -90,6 +90,20 @@ root@192.168.0.100's password: ******** (ProvidedPassword)
 == Deploy From Prebuilt Containers (`hello-openshift` version)
 
 In this scenario, Joe wants to deploy an application based on a container created by someone. 
+* There are 2 versions for this demonstration
+** The "Hello-Openshift" Version 
+*** This versions is a simple "Hello world" container and takes seconds to load
+*** Anyone can deploy this demo and it does not require much practice
+*** To deploy this version simply follow the instructions in this section.
+
+** The "weightwatcher" version (Next one)
+*** This is a full BRMS realtime decision server demo forked from StefanoPicozzi/weightwatcher
+*** This demonstration will require some basic Middleware know-how and practice
+*** Information is available in: link:https://github.com/jbossdemocentral/brms-weightwatcher-realtime-decision-server-demo[https://github.com/jbossdemocentral/brms-weightwatcher-realtime-decision-server-demo]
+*** Its recommended that you run this demo at least once before you show it to a client, this will also cache and download the image to make it faster.
+*** This demonstration is much more impressive as we can show a pretty GUI and tell a nice story about micro services.
+*** Stefano Picozzi is the man behind the container, reach out to him for assistance.  (Stef, Tag, you're it)
+ 
  
 === Login and Authenticate  
 
@@ -441,11 +455,12 @@ No events.
 == Deploy From Prebuilt Containers (`weightwatcher` version)
  
 In this scenario, Joe wants to deploy an application based on a pre-built container.
+
 * There are 2 versions for this demonstration
-** The "Hello-Openshift" Version
+** The "Hello-Openshift" Version (Above)
 *** This versions is a simple "Hello world" container and takes seconds to load
 *** Anyone can deploy this demo and it does not require much practice
-*** To deploy this version simply follow the instructions below *but* use the `hello-openshift-pod.json` and `hello-openshift-complete.json` files instead of the `weightwatcher-*.json` files 
+*** To deploy this version simply follow the instructions In the previous section. 
 
 ** The "weightwatcher" version 
 *** This is a full BRMS realtime decision server demo forked from StefanoPicozzi/weightwatcher
