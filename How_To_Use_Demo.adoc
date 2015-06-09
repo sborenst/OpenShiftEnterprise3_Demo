@@ -27,10 +27,9 @@ If you forgot your username or password, go to https://www.opentlc.com/pwm to re
 In a few minutes you will receive an email containing the details on how to connect to the environment.
 
 . Wait about 20 minutes to allow the environment to build. Your environment includes the following entities:
-** One host for the broker
+** One host for the master
 ** Two hosts for nodes
 ** One administration host for connection into the environment and miscellaneous tasks
-** IPA
 
 
 [WARNING] 
@@ -43,13 +42,7 @@ Because the environment is all cloud-based, you can access it over the WAN from 
 
 To access any of your systems via SSH, you must use your personal OPENTLC SSO username and public SSH key. Unless otherwise noted, you cannot use SSH to connect directly as root.
 
-If you have not already done so, you must provide a public SSH key. For information on generating an SSH key, see:
-
-* Windows: 
-link:http://kb.site5.com/shell-access-ssh/how-to-generate-ssh-keys-and-connect-to-your-account-with-putty[http://kb.site5.com/shell-access-ssh/how-to-generate-ssh-keys-and-connect-to-your-account-with-putty]
-
-* Linux/OSX:
-link:https://www.opentlc.com/ssh.html[https://www.opentlc.com/ssh.html]
+If you have not already done so, you must provide a public SSH key. For information on generating an SSH key, see: link:https://www.opentlc.com/ssh.html[https://www.opentlc.com/ssh.html]
 
 
 [start=1]
@@ -447,8 +440,21 @@ No events.
 
 == Deploy From Prebuilt Containers (`weightwatcher` version)
  
-In this scenario, Joe wants to deploy an application based on a container someone created. 
- 
+In this scenario, Joe wants to deploy an application based on a pre-built container.
+* There are 2 versions for this demonstration
+** The "Hello-Openshift" Version
+*** This versions is a simple "Hello world" container and takes seconds to load
+*** Anyone can deploy this demo and it does not require much practice
+*** To deploy this version simply follow the instructions below *but* use the `hello-openshift-pod.json` and `hello-openshift-complete.json` files instead of the `weightwatcher-*.json` files 
+
+** The "weightwatcher" version 
+*** This is a full BRMS realtime decision server demo forked from StefanoPicozzi/weightwatcher
+*** This demonstration will require some basic Middleware know-how and practice
+*** Information is available in: link:https://github.com/jbossdemocentral/brms-weightwatcher-realtime-decision-server-demo[https://github.com/jbossdemocentral/brms-weightwatcher-realtime-decision-server-demo]
+*** Its recommended that you run this demo at least once before you show it to a client, this will also cache and download the image to make it faster.
+*** This demonstration is much more impressive as we can show a pretty GUI and tell a nice story about micro services.
+*** Stefano Picozzi is the man behind the container, reach out to him for assistance.  (Stef, Tag, you're it)
+
 === Log In and Authenticate 
 
 . *Action* - Log in to your server and switch to the user `joe`:
