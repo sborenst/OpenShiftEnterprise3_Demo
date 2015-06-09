@@ -1,6 +1,6 @@
-== Demonstration Goals and Audience
+# Demonstration Goals and Audience
 
-.Developer's Day Demonstration Scenario (the Joe track)
+## Developer's Day Demonstration Scenario (the Joe track)
 
 * *Goal* - Demonstrate OpenShift Enterprise's ability to simplify and streamline rapid application development
 * *Audience* - This is a technical demonstration intended for technical resources, but you can present it at different depths
@@ -13,7 +13,7 @@
 
 
 
-.Operation Team's Day Demonstration Scenario (the Alice track) *Under Construction and not available*
+## Operation Team's Day Demonstration Scenario (the Alice track) *Under Construction and not available*
 
 * *Goal* - Demonstrate OpenShift Enterprise's ability to reduce the complexity of application deployment and management
 * *Audience* - This is a technical demonstration intended for technical resources, but you can present it at different depths
