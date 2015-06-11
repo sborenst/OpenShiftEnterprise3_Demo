@@ -102,7 +102,7 @@ The demonstration labs use the following terms to describe your actions:
 
 In this scenario, Joe wants to deploy an application based on a container created by someone. 
 
-* There are 2 versions for this demonstration
+*l There are 2 versions for this demonstration
 ** The "Hello-Openshift" Version 
 *** This versions is a simple "Hello world" container and takes seconds to load
 *** Anyone can deploy this demo and it does not require much practice
@@ -762,8 +762,9 @@ In this scenario, Joe wants to deploy and test an application from an existing G
 *** The source code repository 
 *** The builder image or the base image on which to build the container 
 
-. *Action* - Click the blue arrow to progress to the next step, and select *"ruby-20-rhel7:latest"*. 
-** *Explain* that you picked the *ruby-20-rhel7:latest* image as your builder image. The code and all of its dependencies will be layered on top of this image.
+. *Action* - Click the blue arrow to progress to the next step, and select *"ruby-20-rhel7:v0.4.3.2"*. 
+** *Beta Note* We are currently using this image because that is the image fitting Beta3 - In the future we will use "Latest"
+** *Explain* that you picked the *ruby-20-rhel7:v0.4.3.2* image as your builder image. The code and all of its dependencies will be layered on top of this image.
 ** *Explain* that you can have OpenShift Enterprise automatically rebuild and redeploy the entire application if an image update occurs.
 ** *Explain* that you can have different `ImageStreams`. You can deploy from either certified Red Hat builder images or your own.
 

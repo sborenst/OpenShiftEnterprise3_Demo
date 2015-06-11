@@ -12,7 +12,7 @@
         "dockerImageRepository": "registry.access.redhat.com/openshift3_beta/ruby-20-rhel7",
         "tags": [
           {
-            "name": "latest",
+            "name": "v0.4.3.2",
             "annotations": {
               "description": "Build and run Ruby 2.0 applications",
               "iconClass": "icon-ruby",
