@@ -87,9 +87,21 @@ root@192.168.0.100's password: ******** (ProvidedPassword)
 
 ----
 
+== Legend
+
+The demonstration labs use the following terms to describe your actions: 
+
+* *Action* - Something you need to do. Notice that sometimes the action goes before the explanation, and some times after. If an action takes a while, it is better to start the action and then discuss it.
+* *Explain* - This means you should explain what is happening. You do not need to explain things at length, but you should not assume that everyone is clear on everything that is happening. _Explaining is where you make your mark and educate the client._
+* *Point out* - This means there are several items to point out in a larger group of items. For example, you would point out a few lines in a JSON file but not explain every line in the file. 
+* *Show* - Here you let the audience look at the screen and take everything in. This is usually a good spot to ask for questions from the audience. 
+* *Ask* - This is where you could start a debate with the audience. For example, "How do you currently deal with scaling your applications?" Questions should be productive and ideally serve to address pain points that might occur when someone is showing the solution with the product.
+* *Caution* - This event has the potential to put your demonstration at risk. Pay attention to the warning.  
+
 == Deploy From Prebuilt Containers (`hello-openshift` version)
 
 In this scenario, Joe wants to deploy an application based on a container created by someone. 
+
 * There are 2 versions for this demonstration
 ** The "Hello-Openshift" Version 
 *** This versions is a simple "Hello world" container and takes seconds to load
@@ -460,7 +472,7 @@ In this scenario, Joe wants to deploy an application based on a pre-built contai
 ** The "Hello-Openshift" Version (Above)
 *** This versions is a simple "Hello world" container and takes seconds to load
 *** Anyone can deploy this demo and it does not require much practice
-*** To deploy this version simply follow the instructions In the previous section. 
+	*** To deploy this version simply follow the instructions In the previous section. 
 
 ** The "weightwatcher" version 
 *** This is a full BRMS realtime decision server demo forked from StefanoPicozzi/weightwatcher
