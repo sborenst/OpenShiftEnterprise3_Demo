@@ -1,21 +1,46 @@
 {
-  "id": "weightwatcher-pod",
   "kind": "Pod",
-  "apiVersion":"v1beta2",
-  "labels": {
-    "name": "weightwatcher-singlesadpod"
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "weightwatcher",
+    "creationTimestamp": null,
+    "labels": {
+      "name": "weightwatcher"
+    }
   },
-  "desiredState": {
-    "manifest": {
-      "version": "v1beta1",
-      "id": "weightwatcher-singlesadpod",
-      "containers": [{
+  "spec": {
+    "containers": [
+      {
         "name": "weightwatcher-singlesadpod",
         "image": "spicozzi/weightwatcher",
-        "ports": [{
-          "containerPort": 8080
-        }]
-      }]
-    }
-  }
-} 
+        "ports": [
+          {
+            "hostPort": 36061,
+            "containerPort": 8080,
+            "protocol": "TCP"
+          }
+        ],
+        "resources": {
+          "limits": {
+            "cpu": "10m",
+            "memory": "16Mi"
+          }
+        },
+        "terminationMessagePath": "/dev/termination-log",
+        "imagePullPolicy": "IfNotPresent",
+        "capabilities": {},
+        "securityContext": {
+          "capabilities": {},
+          "privileged": false
+        },
+        "nodeSelector": {
+          "region": "primary"
+        }
+      }
+    ],
+    "restartPolicy": "Always",
+    "dnsPolicy": "ClusterFirst",
+    "serviceAccount": ""
+  },
+  "status": {}
+}
