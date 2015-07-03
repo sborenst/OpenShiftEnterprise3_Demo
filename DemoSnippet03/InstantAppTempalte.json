@@ -75,7 +75,7 @@
         "creationTimestamp": null
       },
       "spec": {
-        "dockerImageRepository": "registry.access.redhat.com/openshift3_beta/ruby-20-rhel7"
+        "dockerImageRepository": "registry.access.redhat.com/openshift3/ruby-20-rhel7"
       },
       "status": {
         "dockerImageRepository": ""
@@ -125,7 +125,6 @@
               "name": "ruby:latest",
               "namespace": "openshift"
             },
-<<<<<<< HEAD
             "incremental": true
           }
         },
@@ -140,14 +139,12 @@
       "status": {
         "lastVersion": 0
       }
-=======
             "image": "openshift/ruby-20-rhel7",
-            "tag": "v0.4.3.2"
+            "tag": "latest"
           },
           "type": "imageChange"
         }
       ]
->>>>>>> 565a22a4831517bdfac7d9e1574553c83757d254
     },
     {
       "kind": "DeploymentConfig",
@@ -242,9 +239,7 @@
           }
         }
       },
-<<<<<<< HEAD
       "status": {}
-=======
       "triggers": [
         {
           "imageChangeParams": {
@@ -255,12 +250,11 @@
             "from": {
               "name": "origin-ruby-sample"
             },
-            "tag": "v0.4.3.2"
+            "tag": "Latest"
           },
           "type": "ImageChange"
         }
       ]
->>>>>>> 565a22a4831517bdfac7d9e1574553c83757d254
     },
     {
       "kind": "Service",
