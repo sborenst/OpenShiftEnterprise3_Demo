@@ -125,6 +125,7 @@
               "name": "ruby:latest",
               "namespace": "openshift"
             },
+<<<<<<< HEAD
             "incremental": true
           }
         },
@@ -139,6 +140,14 @@
       "status": {
         "lastVersion": 0
       }
+=======
+            "image": "openshift/ruby-20-rhel7",
+            "tag": "v0.4.3.2"
+          },
+          "type": "imageChange"
+        }
+      ]
+>>>>>>> 565a22a4831517bdfac7d9e1574553c83757d254
     },
     {
       "kind": "DeploymentConfig",
@@ -233,7 +242,25 @@
           }
         }
       },
+<<<<<<< HEAD
       "status": {}
+=======
+      "triggers": [
+        {
+          "imageChangeParams": {
+            "automatic": true,
+            "containerNames": [
+              "ruby-helloworld"
+            ],
+            "from": {
+              "name": "origin-ruby-sample"
+            },
+            "tag": "v0.4.3.2"
+          },
+          "type": "ImageChange"
+        }
+      ]
+>>>>>>> 565a22a4831517bdfac7d9e1574553c83757d254
     },
     {
       "kind": "Service",
