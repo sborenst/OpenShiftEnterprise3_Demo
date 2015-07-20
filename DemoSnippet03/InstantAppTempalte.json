@@ -43,11 +43,17 @@
       "kind": "Route",
       "apiVersion": "v1",
       "metadata": {
-        "name": "route-edge",
+        "name": "example-route",
         "creationTimestamp": null
       },
       "spec": {
         "host": "instantapp-demo.cloudapps-GUID.oslab.opentlc.com",
+        "to": {
+          "kind": "Service",
+          "name": "frontend"
+        }
+      },
+      "spec": {
         "to": {
           "kind": "Service",
           "name": "frontend"
@@ -114,7 +120,7 @@
           "type": "Git",
           "git": {
             "uri": "git://github.com/openshift/ruby-hello-world.git",
-            "ref": "beta4"
+            "ref": "master"
           }
         },
         "strategy": {
@@ -139,12 +145,6 @@
       "status": {
         "lastVersion": 0
       }
-            "image": "openshift/ruby-20-rhel7",
-            "tag": "latest"
-          },
-          "type": "imageChange"
-        }
-      ]
     },
     {
       "kind": "DeploymentConfig",
@@ -240,21 +240,6 @@
         }
       },
       "status": {}
-      "triggers": [
-        {
-          "imageChangeParams": {
-            "automatic": true,
-            "containerNames": [
-              "ruby-helloworld"
-            ],
-            "from": {
-              "name": "origin-ruby-sample"
-            },
-            "tag": "Latest"
-          },
-          "type": "ImageChange"
-        }
-      ]
     },
     {
       "kind": "Service",
@@ -318,7 +303,7 @@
             "containers": [
               {
                 "name": "ruby-helloworld-database",
-                "image": "registry.access.redhat.com/openshift3_beta/mysql-55-rhel7:latest",
+                "image": "registry.access.redhat.com/openshift3/mysql-55-rhel7:latest",
                 "ports": [
                   {
                     "containerPort": 3306,

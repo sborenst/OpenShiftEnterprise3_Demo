@@ -15,7 +15,6 @@
         "image": "spicozzi/weightwatcher",
         "ports": [
           {
-            "hostPort": 36061,
             "containerPort": 8080,
             "protocol": "TCP"
           }
