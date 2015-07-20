@@ -31,7 +31,7 @@
         "name": "hello-openshift-route"
       },
       "spec": {
-        "host": "hello-openshift.cloudapps-GUID.oslab.opentlc.com",
+        "host": "hello-openshift-demo.cloudapps-GUID.oslab.opentlc.com",
         "to": {
           "name": "hello-openshift-service"
         },
@@ -71,7 +71,7 @@
             "containers": [
               {
                 "name": "hello-openshift",
-                "image": "openshift/hello-openshift:latest",
+                "image": "openshift/hello-openshift:v0.4.3",
                 "ports": [
                   {
                     "name": "hello-openshift-tcp-8080",
