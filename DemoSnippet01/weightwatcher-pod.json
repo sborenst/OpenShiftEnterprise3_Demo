@@ -22,7 +22,7 @@
         "resources": {
           "limits": {
             "cpu": "10m",
-            "memory": "16Mi"
+            "memory": "500Mi"
           }
         },
         "terminationMessagePath": "/dev/termination-log",
@@ -30,7 +30,7 @@
         "capabilities": {},
         "securityContext": {
           "capabilities": {},
-          "privileged": false
+          "privileged": true
         },
         "nodeSelector": {
           "region": "primary"
