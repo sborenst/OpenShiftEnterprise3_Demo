@@ -1,0 +1,179 @@
+= Deploy a two-tiered application from a template
+:scrollbar:
+:data-uri:
+:toc: macro
+
+
+toc::[]
+
+== Deploy a Two-Tiered Application From a Template (Web Console and Command Line)
+
+=== Scenario
+
+In this scenario, David wants to deploy a two-tiered `Web-DB` application using an `Instant Apps` template.
+
+
+=== Before you begin
+
+* Did you provision your environment and run the the Demo Deployment Script as
+described in
+link:Demonstration.Environment.Setup.adoc[Demonstration Environment Setup] page?
+* Do you know your environment's GUID? (This would appear in the provisioning
+  email you would have received when you requested your environment)
+* If you already authenticated to openshift (*oc login* command) with a user
+(e.g 'david') you don't need to do it again every snippet and you can skip those
+ instructions in the snippet.
+* Credentials for the 'root' user is available in the demonstration environment
+description in rhpds.redhat.com not in this document.
+* Did you read the _Legend_ and demonstration tips in the
+link:Additional.Information.adoc[additional information] page?
+
+* good luck,
+
+
+
+=== Deploy Your Application Using the Web Console
+
+. *Action* - Browse to the OpenShift Enterprise web console: link:https://master00-GUID.oslab.opentlc.com:8443[https://master00-GUID.oslab.opentlc.com:8443].
++
+[NOTE]
+Remember that *GUID* in the URL refers to your Global Unique Identifier.
+
+. *Action* - Log in using the `david` account with password `R3dh4t1!`
+** *Explain* - I am currently logging into the OpenShift Enterprise web console as the user `david`.
+** *Point out* the following:
+*** You can create users locally or link to an enterprise directory.
+*** You can group users and create teams.
+*** You can use quotas to set resource limits on users, projects, and teams.
+
+. *Action* - Select the `Instant Apps Demonstration` project.
+. *Action* - Click the *Create* button.
+. *Action* Click `instantapp-2tier-application`.
+** *Explain* that you are now creating a new application from a template that was loaded in the OpenShift Enterprise environment.
+
+. *Action* - Click the *Select Template* box.
+** *Explain* that you need to review the images and edit the application attributes, such as labels and parameters.
+** *Show* that you can set a label for the application to manage it by label.
+** *Show* that parameters such as usernames and credentials are generated for each template, but you can also set them manually.
+
+. *Action* - Click *Create*.
+** *Explain* what is about to happen: Builds are getting started and services are being created for the front end and back end.
+. *Optional* - Select *Browse* on the left side of the screen and show the *Builds*, *Services*, and *Pods* panes.
+
+=== Log In and Authenticate
+
+. *Action* - Log in to your server and switch to the user `david`:
++
+----
+
+[sborenst@desktop01 ~]$ ssh -i ~/.ssh/sborenstkey.pub shacharb-redhat.com@oselab-GUID.oslab.opentlc.com
+
+[bash-4.2$ ~] ssh root@192.168.0.100
+root@192.168.0.100's password: ******** (r3dh4t1!)
+
+[root@master00-GUID ~]# su - david
+
+----
+
+. *Action:* - As user `david`, log in to OpenShift Enterprise and select the `instantapps-demo` project.
++
+** *Caution* - If you have _already logged in_ to OpenShift Enterprise, _do not_ run the `oc login` command again. You are already logged in, and this will result in an error on the screen.
+** *Explain* that you are currently logging in to the master as part of this demonstration, but consider that every command that `david` issues is a command that the developer could do on his or her laptop or workstation, or from wherever he or she is working.
+** *Explain* what projects are and how different projects could have different user permissions and quotas attached to them.
++
+----
+
+[david@master00~]$ oc login -u david --insecure-skip-tls-verify --server=https://master00-${GUID}.oslab.opentlc.com:8443
+----
+. If you are not already using the *instantapps-demo* project, switch to it:
++
+----
+
+[david@master00~]$ oc project instantapps-demo
+Using project "instantapps-demo"
+
+----
+
+
+=== Review the Build Process
+
+. *Action* - Run the following commands to display the current process.
++
+** *Explain* the process the audience is seeing and the different resources that you created.
+** *Point out* the following
+*** The `service` resource created for `frontend` and `backend`
+*** The `route` resource created for the `frontend`
++
+----
+
+[david@master00~]$ oc get builds
+NAME                  TYPE      STATUS     POD
+ruby-sample-build-1   Source    Complete   ruby-sample-build-1-build
+----
+
+. *Action* Look at the build logs using the *oc build-logs* command
++
+----
+[david@master00~]$ oc build-logs ruby-sample-build-1
+I0703 09:57:49.921355       1 sti.go:388] ---> Installing application source
+I0703 09:57:49.990848       1 sti.go:388] ---> Building your Ruby application from source
+I0703 09:57:49.990927       1 sti.go:388] ---> Running 'bundle install --deployment'
+I0703 09:57:56.212277       1 sti.go:388] Fetching gem metadata from https://rubygems.org/..........
+I0703 09:58:00.672821       1 sti.go:388] Installing rake (10.3.2)
+I0703 09:58:02.017834       1 sti.go:388] Installing i18n (0.6.11)
+I0703 09:58:09.992863       1 sti.go:388] Installing json (1.8.1)
+
+...
+...
+I0703 09:58:57.122259       1 cfg.go:64] Using serviceaccount user for Docker authentication
+I0703 09:58:57.122318       1 sti.go:96] Using provided push secret for pushing 172.30.133.153:5000/instantapps/ruby-sample image
+I0703 09:58:57.122351       1 sti.go:99] Pushing 172.30.133.153:5000/instantapps/ruby-sample image ...
+I0703 10:02:01.730922       1 sti.go:103] Successfully pushed 172.30.133.153:5000/instantapps/ruby-sample
+
+----
+
+
+
+. *Action* While you wait for the build to complete, expose the *service* and create the route for the application.
+* *CAUTION* Don't skip this step!, if you don't *expose* the service, the application will *NOT be accessible from the outside* world.
+** *Explain* that in this scenario, you decided to add another route to your application, so it is available under another URL.
+** *Explain* that you are creating a route so that when a user resolves `myinstant.cloudapps-$GUID.oslab.opentlc.com`, you will "route" (actualy its more like "proxy") the user to one of the pods under the `frontend` service.
++
+----
+[david@master00~]$ oc expose service frontend --name=myinst-route --hostname=myinst.cloudapps-$GUID.oslab.opentlc.com
+----
+
+
+
+. *Show* that the pods were all created, 2 for the *frontend* and 1 *database* backend.
++
+----
+[david@master00~]$ oc get pods
+NAME                        READY     REASON       RESTARTS   AGE
+database-1-3vjjb            1/1       Running      0          5m
+frontend-1-akq23            1/1       Running      0          25s
+frontend-1-yiivo            1/1       Running      0          24s
+ruby-sample-build-1-build   0/1       ExitCode:0   0          5m
+
+----
+
+. *Show* that the Services were all created, 1 for the *frontend* and 1 *database* backend service.
++
+----
+[david@master00~]$ oc get services
+NAME       LABELS                                   SELECTOR        IP(S)            PORT(S)
+database   template=application-template-stibuild   name=database   172.30.176.104   5434/TCP
+frontend   template=application-template-stibuild   name=frontend   172.30.149.55    5432/TCP
+----
+
+
+
+=== Complete the Demonstration
+
+. *Action* - Browse to: link:http://instantapp-demo.cloudapps-$GUID.oslab.opentlc.com[instantapp.cloudapps-$GUID.oslab.opentlc.com].
+** *Explain* what you did, and that this is a very common workflow for every development environment.
+** *Point out* the following:
+*** You created a Ruby front end and a database backend.
+*** Using the template, both parts of the application environment can share values like usernames and passwords.
+*** You can randomize and generate values for each template.
+*** You created a route to direct to the front end service.

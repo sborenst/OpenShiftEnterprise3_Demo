@@ -1,0 +1,133 @@
+== Set up your Demonstration Environment
+
+=== Provision Your Demonstration Environment Using Red Hat Product Demo System.
+
+To perform this demonstration, you must provision the demonstration environment.
+Provisioning ensures that you have access to an environment containing all the
+components you need to perform this demonstration.
+
+NOTE: In case you already have an *"OpenShift FASTRAX"* environment you could
+use it as they are exactly the same. That means you can skip the following steps
+and skip to  *"Run the Deployment Script"* section
+
+
+. Go to https://rhpds.redhat.com and use your credentials to log in to the
+OPENTLC labs provisioning system, which is built on top of Red Hat CloudForms
+to provide a self-service portal.
++
+[TIP]
+If you forgot your username or password, go to https://www.opentlc.com/pwm to
+reset your password or obtain a username reminder.
+
+. After you log in, navigate to *Services -> Catalogs -> All Services ->
+Cloud Infrastructure Demos*.
+
+. On the left side of the screen, locate the *OpenShift 3.0 Demo* catalog item
+and select it.
+
+. Read the demo's description text for updates other important information
+
+IMPORTANT: The root user credentials for the demonstration environment will be
+listed in the Demonstration description box, make sure you note them down as
+they will not be mentioned anywhere in this document.
+
+. Click the *Order* button that appears on the right.
+
+. On the next screen, click *Submit* (on the lower right side) to
+order your environment.
++
+In a few minutes you will receive an email containing the details on how to
+connect to the environment.
+
+. Wait about 30 minutes to allow the environment to build. Your environment
+includes the following entities:
+- One host for the Master
+- One Infrastructure node (Not required) <1>
+- Two hosts for nodes
+- One administration host for connection into the environment and miscellaneous
+tasks
+- IPA identity management
+
+<1> We use this server to demonstrate a highly scalable architecture
+[WARNING]
+Do not attempt to use *App Control -> Start* after ordering the demo.
+The environment is already starting up. Using this command this may corrupt
+your environment or cause other complications. To receive an email with your
+environments status, select *Status*.
+
+[NOTE]
+Because the environment is all cloud-based, you can access it over the WAN from
+anywhere. You should not, however, expect performance to match a bare-metal
+environment.
+=== Set Up SSH
+
+To access any of your lab systems via SSH, you must use your personal
+OPENTLC SSO user name and public SSH key. *(These are the credentials you used
+  to connect to _labs.opentlc.com_ and _rhpds.redhat.com_`)
+
+
+`If you have not already done so`, you must provide a public SSH key to the
+OPENTLC authentication system.
+
+. Go to https://www.opentlc.com/update and log in. (Using your Opentlc credentials)
++
+NOTE: For more information on generating an SSH key,
+see the following:
+link:https://www.opentlc.com/ssh.html[https://www.opentlc.com/ssh.html]
+
+. Paste your public key in that location.
+
+=== Test your ability to connect to your servers
+
+The `oselab` host, (aka: the administration host) is just there to serve
+as an access point into the environment and is not part of the OpenShift
+environment. (We do actually use th oselab as our dedicated DNS server, but that
+  is not an OpenShift component.)
+
+NOTE: An email with all the host Public IPs and DNS host names was sent to you
+as soon as the environment started provisioning, if you did not recieve this
+email please check your spam folder and verify in RHPDS that your environment
+has been deployed.
+
+. Connect to your administration host and make sure you can access each of your
+provisioned hosts:
++
+----
+ssh -i ~/.ssh/yourprivatekey.key opentlcuser@oselab-GUID.oslab.opentlc.com
+----
+
+[NOTE]
+The text *GUID* is a 4-character unique identifier generated for your lab
+environment. Your GUID is at the top of the lab provisioning email.
++
+[NOTE]
+In these labs, you will see "$guid" and $GUID" used to signify your unique
+identifier, We create a environment variable so you don't have to type it each
+time.
+
+.Example
+----
+Laptop$ ssh -i ~/.ssh/mykey.key shacharb-redhat.com@oselab-c3po.oslab.opentlc.com
+(root password is: r3dh4t1!)
+----
+
+. Once connected to *oselab*, test the connection to each server:
+.. use the same *root* password as before : *r3dh4t1!*, when prompted
++
+----
+-bash-4.2$ ssh root@192.168.0.100
+-bash-4.2$ ssh root@192.168.0.101
+-bash-4.2$ ssh root@192.168.0.200
+-bash-4.2$ ssh root@192.168.0.201
+----
+
+== Run the Deployment Script
+To create the users, projects and other resources that are required for the
+Demonstration, we need to run the *Demo_Deployment_Script.sh*
+
+. From the *Master* (Master00) server, As *root*, run the following command and watch the
+script for errors:
++
+----
+[root@master00-GUID ~]# bash /root/Demo_Deployment_Script.sh
+----

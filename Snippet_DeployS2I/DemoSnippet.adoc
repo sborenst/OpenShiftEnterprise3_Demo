@@ -1,0 +1,190 @@
+= Deploy Application from Git repository Using S2I Build and scale.
+:scrollbar:
+:data-uri:
+:toc: macro
+
+
+toc::[]
+
+== Deploy From an Existing Git Repository 
+
+=== Scenario
+
+In this scenario, David wants to deploy and test an application from an existing Git repository.
+
+=== Before you begin
+
+* Did you provision your environment and run the the Demo Deployment Script as
+described in
+link:Demonstration.Environment.Setup.adoc[Demonstration Environment Setup] page?
+* Do you know your environment's GUID? (This would appear in the provisioning
+  email you would have received when you requested your environment)
+* If you already authenticated to openshift (*oc login* command) with a user
+(e.g 'david') you don't need to do it again every snippet and you can skip those
+ instructions in the snippet.
+* Credentials for the 'root' user is available in the demonstration environment
+description in rhpds.redhat.com not in this document.
+* Did you read the _Legend_ and demonstration tips in the
+link:Additional.Information.adoc[additional information] page?
+
+* good luck,
+
+
+In this scenario, David wants to deploy and test an application from an existing Git repository.
+
+=== Review the Target Git Repository and Log In to the OpenShift Web Console
+
+. *Action* - Browse to link:https://github.com/openshift/simple-openshift-sinatra-sti[https://github.com/openshift/simple-openshift-sinatra-sti].
+** *Explain* that what you see here is a Git repository containing a sample Ruby application using the Sinatra Ruby Gem.
+
+** *Optional* - Review the files briefly with the audience if you think it would help them understand.
+. *Action* - Browse to link:https://master00-GUID.oslab.opentlc.com:8443[https://master00-GUID.oslab.opentlc.com:8443] and log in using the `david` account with password `R3dh4t1!`
++
+[NOTE]
+*GUID* in the URL refers to your Global Unique Identifier.
++
+** *Explain* that you are currently logging into the OpenShift web console as the user `david`.
+** *Point out* the following:
+*** You can create users locally or link to an enterprise directory.
+*** You can group users and create working teams.
+*** You can use quotas to set resource limits for users, projects, and teams.
+
+=== Deploy Your S2I Application
+
+. *Action* - Select the *SourceToImage* project.
+. *Action* - Click the *Create* button.
+. *Action* - Paste the Git repository into the *Source Repository* text box: link:https://github.com/openshift/simple-openshift-sinatra-sti[https://github.com/openshift/simple-openshift-sinatra-sti]
+** *Explain* that you are creating a new application. To do that, you need to provide OpenShift Enterprise with two key pieces of information:
+*** The source code repository
+*** The builder image or the base image on which to build the container
+
+. *Action* - Click the blue arrow to progress to the next step, and select *"ruby-20-rhel7"*.
+** *Explain* that you picked the *ruby-20-rhel7* image as your builder image. The code and all of its dependencies will be layered on top of this image.
+** *Explain* that you can have OpenShift Enterprise automatically rebuild and redeploy the entire application if an image update occurs.
+** *Explain* that you can have different `ImageStreams`. You can deploy from either certified Red Hat builder images or your own.
+
+. *Action* - Confirm your selection by clicking *Select this Image*.
+** *Show* and *explain* that next you select the application attributes, such as ports, routes, triggers, and more.
+
+. *Action* - Set the name of the application to `simplerubyapp`.
+** *Show* that you can select to have a route for the application or not.
+** *Show* that you can select the number of replicas the application has.
+** *Show* that you can set a label for the application to manage it by label.
+
+. *Action* - Click *Create*.
+** *Show* that you got a successful message stating "All resources for application `simplerubyapp` were created successfully."
+** *Show* that there are currently no pods created.
+
+. *Action* - Click *Browse* and then *Builds*
+** *Show* That you can start a build or wait for the build to start automaticaly
+
+
++
+[NOTE]
+The web console should refresh shortly to indicate that a build was started.
+
+=== The Build Process
+
+. *Action* - Connect as user `david` to your master host and authenticate to OpenShift Enterprise using the `oc login` command.
+** *Caution* - If you have _already logged in_ to OpenShift Enterprise, _do not_ run the `oc login` command again. You are already logged in, and this will result in an error on the screen.
++
+----
+
+[david@master00~]$ oc login -u david --insecure-skip-tls-verify --server=https://master00-${GUID}.oslab.opentlc.com:8443
+----
+
+. If you are not already using the *sourcetoimage-demo* project, switch to it:
++
+----
+
+[david@master00~]$ oc project sourcetoimage-demo
+Using project "sourcetoimage-demo"
+
+----
+
+
+. *Action* - get information about the build using the *oc get builds* and o
+** *Explain* that you can see that you requested a build process and that you can follow the build log using simple commands.
+** *Point out* a few lines to explain to your audience if they are so inclined. For example, you can point out the following:
+*** The image that OpenShift Enterprise is selecting and importing
+*** The repository read and dependencies installed (Sinatra Gem)
++
+----
+
+[david@master00-31c5]$ oc get builds
+NAME TYPE STATUS POD
+simplerubyapp-1 S2I Running simplerubyapp-1
+
+[david@master00-31c5 openshift]$ oc build-logs simplerubyapp-1
+....
+....
+I0703 09:21:34.916120       1 docker.go:180] Image registry.access.redhat.com/openshift3/ruby-20-rhel7:latest available locally
+I0703 09:21:34.916257       1 docker.go:267] Image contains io.s2i.scripts-url set to 'image:///usr/local/sti'
+I0703 09:21:34.916472       1 download.go:56] Using image internal scripts from: image:///usr/local/sti/assemble
+I0703 09:21:34.916889       1 download.go:56] Using image internal scripts from: image:///usr/local/sti/run
+I0703 09:21:34.943521       1 docker.go:180] Image registry.access.redhat.com/openshift3/ruby-20-rhel7:latest available locally
+....
+.....
+I0703 09:21:36.932550       1 docker.go:357] Attaching to container
+I0703 09:21:36.952808       1 docker.go:414] Starting container
+I0703 09:21:37.596081       1 docker.go:424] Waiting for container
+I0703 09:21:38.109326       1 sti.go:388] ---> Installing application source
+I0703 09:21:38.132331       1 sti.go:388] ---> Building your Ruby application from source
+I0703 09:21:38.132537       1 sti.go:388] ---> Running 'bundle install --deployment'
+I0703 09:21:43.225774       1 sti.go:388] Fetching gem metadata from https://rubygems.org/..........
+I0703 09:21:49.860178       1 sti.go:388] Installing rack (1.5.2)
+I0703 09:21:50.158742       1 sti.go:388] Installing rack-protection (1.5.3)
+I0703 09:21:50.670381       1 sti.go:388] Installing tilt (1.4.1)
+I0703 09:21:52.292218       1 sti.go:388] Installing sinatra (1.4.5)
+I0703 09:21:52.292271       1 sti.go:388] Using bundler (1.3.5)
+I0703 09:21:52.297487       1 sti.go:388] Your bundle is complete!
+....
+....
+I0703 09:22:08.108088       1 sti.go:96] Using provided push secret for pushing 172.30.133.153:5000/sourcetoimage/simplerubyapp image
+I0703 09:22:08.108117       1 sti.go:99] Pushing 172.30.133.153:5000/sourcetoimage/simplerubyapp image ...
+I0703 09:27:07.204498       1 sti.go:103] Successfully pushed 172.30.133.153:5000/sourcetoimage/simplerubyapp
+----
+
+. *Explain* While you wait for the build to complete, *explain* the concepts of _service resources_ and _route resources_.
+.. *Show* the service created for this application under *Browse -> Services* in the web console.
+.. *Explain* services.
+.. *Show* that the route for the application was set.
+
+
+. *Action* Use the *oc get pods* command to display the pods
+.. *Show the status, or REASON, of the pod, it might still be "Pending" if the image is being deployed.
++
+----
+[david@master00-31c5 ~]$  oc get pods
+NAME                    READY     REASON       RESTARTS   AGE
+simplerubyapp-1-build   0/1       ExitCode:0   0          7m
+simplerubyapp-1-toei3   1/1       Running      0          1m
+
+----
+
+=== Expose the service and create the route for the environment
+. *Action* - Run the *oc expose* command to create a route for the application.
+.. *Caution* - Make sure that the GUID value is populated correctly. Review the file and make sure that the `host:` value is set correctly.
+.. *Explain* that in the current version, you do not use the web console to set routes. In the near future, you will be able to do all this in the web console.
+.. *Explain* that in this scenario, you decided to add another route to your application, so it is available under another URL.
+.. *Explain* that you are creating a route so that when a user resolves `simplerubyapp.cloudapps-$GUID.oslab.opentlc.com`, you will route the user to one of the pods under the `simplerubyapp` service.
+.. *Show* - you can use curl or your browser to see the application at link:http://simplerubyapp.cloudapps-$GUID.oslab.opentlc.com[http://simplerubyapp.cloudapps-$GUID.oslab.opentlc.com].
++
+[source,json]
+----
+[david@master00 ~]$ oc expose service simplerubyapp --name=simplerubyapp-route --hostname=simplerubyapp.cloudapps-$GUID.oslab.opentlc.com
+----
+
+. *Optional* - Add the route manually for the environment.
+.. *Action* - Run the *oc expose* command to create a route for the application.
+
+
+=== Complete the Demonstration
+
+. *Action* - Browse to: link:http://simplerubyapp.cloudapps-$GUID.oslab.opentlc.com[http://simplerubyapp.cloudapps-$GUID.oslab.opentlc.com].
+** *Explain* what you did, and that this is a very common workflow for every development environment.
+** *Point out* the following:
+*** You created an image from a Git repository and a builder image.
+*** You created a service that acts as a list that represents all of your pods.
+*** You created a route to direct to that service.
+*** S2I builds _do not_ need to recreate the image every time. When the code changes, the builds just "add a layer" with the code.

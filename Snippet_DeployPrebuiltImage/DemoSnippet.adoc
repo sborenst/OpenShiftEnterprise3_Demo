@@ -1,0 +1,511 @@
+= Deploy Application from a Docker Image and scale.
+:scrollbar:
+:data-uri:
+:toc: macro
+
+
+toc::[]
+
+== Deploy From Prebuilt Containers (`hello-openshift` version)
+
+=== Scenario
+
+In this scenario, David wants to deploy an application based on a container created by someone.
+
+=== Before you begin
+
+* Did you provision your environment and run the the Demo Deployment Script as
+described in
+link:Demonstration.Environment.Setup.adoc[Demonstration Environment Setup] page?
+* Do you know your environment's GUID? (This would appear in the provisioning
+  email you would have received when you requested your environment)
+* If you already authenticated to openshift (*oc login* command) with a user
+(e.g 'david') you don't need to do it again every snippet and you can skip those
+ instructions in the snippet.
+* Credentials for the 'root' user is available in the demonstration environment
+description in rhpds.redhat.com not in this document.
+* Did you read the _Legend_ and demonstration tips in the
+link:Additional.Information.adoc[additional information] page?
+
+* good luck,
+
+=== Login and Authenticate
+
+. *Action* - Login to your server and switch to the user `david`.
++
+----
+#From your workstation
+[sborenst@desktop01 ~]$ ssh -i ~/.ssh/sborenstkey.pub shacharb-redhat.com@oselab-GUID.oslab.opentlc.com
+
+#From you administration host (oselab)
+[bash-4.2$ ~] ssh root@192.168.0.100
+root@192.168.0.100's password: ******** (r3dh4t1!)
+
+# From the Master server (Master00)
+[root@master00-GUID ~]# su - david
+[david@master00-GUID ~]$ #you're in
+
+----
+
+. *Action* - As user `david` log in to OpenShift (Password: *r3dh4t1!*)and select the `hello-openshift-demo` project.
++
+** *Caution* - If you have _already logged in_ to OpenShift Enterprise, _do not_ run the `oc login` command again. Because you are already logged in, this will result in an error on screen.
+** *Explain* that you are currently logging in to the master as part of this demonstration, but consider that every command that `david` issues is a command that a developer would do on his or her laptop or workstation, or from wherever he or she is working.
+** *Explain* what projects are and how different projects could have different user permissions and quotas attached to them.
++
+----
+
+[david@master00~]$ oc login -u david --insecure-skip-tls-verify --server=https://master00-${GUID}.oslab.opentlc.com:8443
+(Password is: r3dh4t1!)
+
+----
+
+You should expect output similar to this one:
+----
+Login successful.
+
+Using project "hello-openshift-demo".
+
+You have access to the following projects and can switch between them with 'oc project <projectname>':
+
+  * hello-openshift-demo (current)
+  * instantapps-demo
+  * sourcetoimage-demo
+  * weightwatcher-demo
+
+Welcome to OpenShift! See 'oc help' to get started.
+
+
+----
+. If you are not already using the *hello-openshift-demo* project, switch to it:
++
+----
+[david@master00]$ oc project hello-openshift-demo
+Now using project "hello-openshift-demo" on server "https://master00-8675.oslab.opentlc.com:8443".
+
+----
+
+=== Define the Pod
+
+Here you define the pod, but not the service, replication controllers, or routes.
+
+. *Show* the `hello-openshift-podonly.json` file.
+** *Explain* that this is a very simple pod definition example and it does not cover services, routes, and other resources.
+** *Point out* the following:
+*** `name` - This is the name of the pod.
+*** `image` - This is the container image that this pod is running. This can be a local registry or an external one (like `docker.io`).
+*** `ports` - These are the ports that the Docker container exposes. Your code and application need to listen on those ports as well.
+*** `labels` - This is perhaps the most important component. Labels are "tags" that you apply, so that you can refer to a group of resources (pods, services, and so on).
++
+[source,json]
+----
+
+[david@master00]$ cat hello-openshift-pod.json
+{
+  "kind": "Pod",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "hello-openshift",
+    "creationTimestamp": null,
+    "labels": {
+      "name": "hello-openshift"
+    }
+  },
+  "spec": {
+    "containers": [
+      {
+        "name": "hello-openshift",
+        "image": "openshift/hello-openshift:latest",
+        "ports": [
+          {
+            "hostPort": 36061,
+            "containerPort": 8080,
+            "protocol": "TCP"
+          }
+        ],
+        "resources": {
+          "limits": {
+            "cpu": "10m",
+            "memory": "16Mi"
+          }
+        },
+        "terminationMessagePath": "/dev/termination-log",
+        "imagePullPolicy": "IfNotPresent",
+        "capabilities": {},
+        "securityContext": {
+          "capabilities": {},
+          "privileged": false
+        },
+        "nodeSelector": {
+          "region": "primary"
+        }
+      }
+    ],
+    "restartPolicy": "Always",
+    "dnsPolicy": "ClusterFirst",
+    "serviceAccount": ""
+  },
+  "status": {}
+}
+
+----
+
+=== Create the Pod
+
+Here you create the pod, but not the service, replication controllers, or routes.
+
+. *Action* - Use the `oc create` command to create the pod from the `hello-openshift-pod.json` file.
+** *Explain* that during this process, OpenShift Enterprise reviews and processes the file. You could easily have added other pods or resources into the file, and OpenShift Enterprise would have processed them together.
+. *Optional* - You can use the `docker ps` command to show the running container and the `docker logs -f $DOCKERPID&` command to show the internal Docker log for the container being built.
++
+----
+
+[david@master00~]$ oc create -f hello-openshift-pod.json
+----
+
+. Expect the following output:
+----
+pods/hello-openshift-pod
+----
+
+. *Action* - Run *oc get pods* to show the pod status and that you can access the pod locally.
+** *Explain* the output to the audience.
+** *Point out* the following:
+*** `NAME` - The pod name.
+*** `REASON` - The pod's status or last error message
+*** `AGE` - The pod age since it was first launched.
+
++
+----
+
+
+[david@master00~]$ oc get pods
+NAME              READY     REASON    RESTARTS   AGE
+hello-openshift   1/1       Running   0          20s
+----
+. *Action* get the pod's information using *oc describe*
++
+----
+[david@master00~]$ oc describe pod hello-openshift
+----
+
+. You will see output similar to this one:
+ ** *Point out* the following:
+*** `Image` - This is the Docker image that is used to deploy this pod.
+*** `Host` - This is the host that our pods resides/runs in.
+*** `IP` - This is the internal IP address accessible on the local network.
++
+----
+Name:                           hello-openshift
+Image(s):                       openshift/hello-openshift:v0.4.3
+Host:                           node00-f4fc.oslab.opentlc.com/192.168.0.200
+Labels:                         name=hello-openshift
+Status:                         Running
+IP:                             10.1.0.9
+Replication Controllers:        <none>
+Containers:
+  hello-openshift:
+    Image:              openshift/hello-openshift:v0.4.3
+    State:              Running
+      Started:          Fri, 03 Jul 2015 02:11:24 -0400
+    Ready:              True
+    Restart Count:      0
+Conditions:
+  Type          Status
+  Ready         True
+Events:
+
+
+----
+
+. *Action* - Test your pod
+. *CATION* You need to use the `IP`of `your` own pod from the last output
++
+----
+[david@master00~]$ curl http://10.1.0.9:8080
+
+----
+. Expect the following output:
++
+----
+Hello OpenShift!
+----
+
+NOTE: The container will be up in a few seconds, but the application in the container might take a few minutes to load.
+
+
+=== Deploy a Complete Application With Service and Route to Match
+
+. *Action* - Review the following complete application example `hello-openshift-complete.json` file.
+** *Ask* how complicated or simple it would be to define a full application stack in the audience's current environment.
+** *Point out* the following:
++
+[NOTE]
+You should understand every line in the file in case the audience asks questions. However, do not explain each line.
+
+*** `"kind": "Service"` - Explain what a service is and that here you are creating a "front end" for this pod or group of pods.
+*** `"kind": "Route"` - Explain that a route resource allows external access using a HAProxy container. You could have many routes to the same application.
+*** `"replicas": 1` - Explain that you currently set this pod to have a single replica. If you want to deploy many replicas or scale out at any time, you can simply change this value.
+*** `"labels":` - The label you enter here is applied to each resource item you create for this application. This simplifies management.
+*** `"triggers":` - This is an optional component. Explain that you can set triggers to redeploy containers under certain conditions--for example, if a newer image is available.
+
++
+[source,json]
+----
+
+[david@master00~]$ cat hello-openshift-complete.json
+{
+  "kind": "List",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "hello-openshift-complete-example"
+  },
+  "items": [
+    {
+      "kind": "Service",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "hello-openshift-service"
+      },
+      "spec": {
+        "selector": {
+          "name": "hello-openshift"
+        },
+        "ports": [
+          {
+            "protocol": "TCP",
+            "port": 27017,
+            "targetPort": 8080
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Route",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "hello-openshift-route"
+      },
+      "spec": {
+        "host": "hello-openshift.cloudapps-GUID.oslab.opentlc.com",
+        "to": {
+          "name": "hello-openshift-service"
+        },
+        "tls": {
+          "termination": "edge"
+        }
+      }
+    },
+    {
+      "kind": "DeploymentConfig",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "hello-openshift"
+      },
+      "spec": {
+        "strategy": {
+          "type": "Recreate",
+          "resources": {}
+        },
+        "triggers": [
+          {
+            "type": "ConfigChange"
+          }
+        ],
+        "replicas": 1,
+        "selector": {
+          "name": "hello-openshift"
+        },
+        "template": {
+          "metadata": {
+            "creationTimestamp": null,
+            "labels": {
+              "name": "hello-openshift"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "name": "hello-openshift",
+                "image": "openshift/hello-openshift:v0.4.3",
+                "ports": [
+                  {
+                    "name": "hello-openshift-tcp-8080",
+                    "containerPort": 8080,
+                    "protocol": "TCP"
+                  }
+                ],
+                "resources": {
+                  "limits": {
+                    "cpu": "10m",
+                    "memory": "16Mi"
+                  }
+                },
+                "livenessProbe": {
+                  "tcpSocket": {
+                    "port": 8080
+                  },
+                  "timeoutSeconds": 1,
+                  "initialDelaySeconds": 10
+                }
+              }
+            ],
+            "restartPolicy": "Always",
+            "dnsPolicy": "ClusterFirst",
+            "serviceAccount": "",
+            "nodeSelector": {
+              "region": "primary"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
+
+----
+
+. *Action* - Create your application using the *oc create* command.
+** *Explain* that by passing the `.json` file to OpenShift Enterprise, you are requesting all the resource items in the file to be created.
+** *Optional* - Show your audience the web console.
+.. *Ask* the audience for any questions. This is a good time to find out, for example, if the process is clear, or if they see themselves using this tool.
++
+----
+
+[david@master00~]$ oc create -f hello-openshift-complete.json
+[david@master00~]$ oc expose service hello-openshift-service --hostname=hello-openshift.cloudapps-$GUID.oslab.opentlc.com
+----
+
+
+=== Show the Application Using Your Browser
+
+. *Action* - Browse to: link:http://hello-openshift.cloudapps-$GUID.oslab.opentlc.com[http://hello-openshift.cloudapps-$GUID.oslab.opentlc.com]
+** *Explain* that you have now  deployed a container that is externally accessible. You could scale the application at any time, and the route and service ensure that traffic always routes to the application.
+** *Big finish* - Offer some closing words on this demo.
+
+
+=== Show the Application Using the Command Line
+
+. *Action* - You can run the following commands to show the application resources from the command line
+.. *Show* The audience that you now have a Pod, a ReplicationController (RC) and a DeploymentConfig (DC)
+.. *Explain* the roles of the RC and DC resources.
+.. *Point Out:*
+... The differences between the single sad pod from the beginning of this demonstration and the pod that was generated by our DC and RC
+... That when we run *oc get rc* and see our RCs we can see how many replicas we are running.
+----
+[david@master00-70ac ~]$ oc get pods
+POD                       IP         CONTAINER(S)                   IMAGE(S)                    HOST                                            LABELS                                                                               STATUS    CREATED
+hello-openshift-1-ok0aa   10.1.0.6   hello-openshift                openshift/hello-openshift   master00-70ac.oslab.opentlc.com/192.168.0.100   deployment=hello-openshift-1,deploymentconfig=hello-openshift,name=hello-openshift   Running   About a minute
+hello-openshift-pod       10.1.0.5   hello-openshift-singlesadpod   openshift/hello-openshift   master00-70ac.oslab.opentlc.com/192.168.0.100   name=hello-openshift-singlesadpod                                                    Running   2 minutes
+[david@master00-70ac ~]$ oc get dc
+NAME              TRIGGERS      LATEST VERSION
+hello-openshift   ImageChange   1
+[david@master00-70ac ~]$ oc get rc
+CONTROLLER          CONTAINER(S)      IMAGE(S)                    SELECTOR                                                                             REPLICAS
+hello-openshift-1   hello-openshift   openshift/hello-openshift   deployment=hello-openshift-1,deploymentconfig=hello-openshift,name=hello-openshift   1
+
+[david@master00-70ac ~]$ curl http://hello-openshift.cloudapps-$GUID.oslab.opentlc.com
+Hello OpenShift!
+----
+
+=== Optional - Show how to increase the replicas of the deployed pods.
+
+. *Action* - Run the following command.
+.. *Explain the role of the DC (DeploymentConfig)
+.. *Point Out:*
+... Triggers - What makes the DC redeploy the pods
+... Replicas - How many replicas are required of this pod - This is where we will make a permanent change to an environment
+
+----
+
+[david@master00-70ac ~]$ oc describe dc hello-openshift
+Name:           hello-openshift
+Created:        3 minutes ago
+Labels:         <none>
+Latest Version: 1
+Triggers:       Config
+Strategy:       Recreate
+Template:
+        Selector:       name=hello-openshift
+        Replicas:       1
+        Containers:
+                NAME            IMAGE                                   ENV
+                hello-openshift openshift/hello-openshift:v0.4.3
+Deployment #1 (latest):
+        Name:           hello-openshift-1
+        Created:        3 minutes ago
+        Status:         Complete
+        Replicas:       1 current / 1 desired
+        Selector:       deployment=hello-openshift-1,deploymentconfig=hello-openshift,name=hello-openshift
+        Labels:         openshift.io/deployment-config.name=hello-openshift
+        Pods Status:    1 Running / 0 Waiting / 0 Succeeded / 0 Failed
+No events.
+
+
+----
+
+
+. *Action* - Run the following command.
+.. *Action* - Use the *oc scale* command to increase the *replica* count from 1 to 10.
+.. *Explain* By changing the DeploymentConfig we are raising the "desired state" of the replica count from 1 to 10, this will result in immediate change.
+.. *Note* How efficient OpenShift 3 is, the output of the *oc scale* command is the simple and concise *"scaled"*
+
+----
+
+[david@master00-70ac ~]$ oc scale dc hello-openshift --replicas=10
+scaled
+----
+
+. *Action* - Run the following commands to show the the new replicas that were created and that the service has updated with the new pods.
+.. *Explain* that new pods are created by the RC the next time it syncs with the desired state defined in the DC
+...*Explain* The Service will be updated with the new pod names as they appear.
+
+----
+[david@master00-70ac ~]$ oc get pods
+NAME                      READY     REASON    RESTARTS   AGE
+hello-openshift-1-0dxco   1/1       Running   0          4m
+hello-openshift-1-0zyoj   1/1       Running   0          4m
+hello-openshift-1-17j8o   1/1       Running   0          8m
+hello-openshift-1-8rfly   1/1       Running   0          8m
+hello-openshift-1-9ve89   1/1       Running   0          4m
+hello-openshift-1-bcw8z   1/1       Running   0          8m
+hello-openshift-1-dtfos   1/1       Running   0          14m
+hello-openshift-1-mtv6s   1/1       Running   0          8m
+hello-openshift-1-r1lbp   1/1       Running   0          4m
+hello-openshift-1-y8ffs   1/1       Running   0          4m
+----
+
+. *Action* Use the *oc describe* command to display the service.
+.. *Explain* That the service is automatically listing all the new pods that have the label: *"name=hello-openshift"*
++
+----
+[david@master00-70ac ~]$ oc describe service hello-openshift-service
+Name:                   hello-openshift-service
+Labels:                 <none>
+Selector:               name=hello-openshift
+Type:                   ClusterIP
+IP:                     172.30.47.5
+Port:                   <unnamed>       27017/TCP
+Endpoints:              10.1.0.14:8080,10.1.0.15:8080,10.1.0.16:8080 + 7 more...
+Session Affinity:       None
+No events.
+----
+
+. *Optional Action* - If you have a room full of syntax geeks you can show this example of getting the pods to display with their nodes and ips
+.. *Explain* that we can use edit the `template` of our output on the fly and call on different attributes in the object
++
+----
+[david@master00-f4fc ~]$ oc get pod -t '{{range .items}}{{.metadata.name}}| {{.status.phase}} | {{.spec.host}} | {{.status.podIP}} {{"\n"}}{{end}}'
+
+hello-openshift-1-0dxco| Running | node01-f4fc.oslab.opentlc.com | 10.1.1.10
+hello-openshift-1-0zyoj| Running | node01-f4fc.oslab.opentlc.com | 10.1.1.9
+hello-openshift-1-17j8o| Running | node00-f4fc.oslab.opentlc.com | 10.1.0.15
+hello-openshift-1-8rfly| Running | node01-f4fc.oslab.opentlc.com | 10.1.1.7
+hello-openshift-1-9ve89| Running | node00-f4fc.oslab.opentlc.com | 10.1.0.16
+hello-openshift-1-bcw8z| Running | node01-f4fc.oslab.opentlc.com | 10.1.1.8
+hello-openshift-1-dtfos| Running | node00-f4fc.oslab.opentlc.com | 10.1.0.14
+hello-openshift-1-mtv6s| Running | node01-f4fc.oslab.opentlc.com | 10.1.1.6
+hello-openshift-1-r1lbp| Running | node00-f4fc.oslab.opentlc.com | 10.1.0.17
+hello-openshift-1-y8ffs| Running | node00-f4fc.oslab.opentlc.com | 10.1.0.18
+
+----
