@@ -69,7 +69,7 @@ Remember that *GUID* in the URL refers to your Global Unique Identifier.
 [sborenst@desktop01 ~]$ ssh -i ~/.ssh/sborenstkey.pub shacharb-redhat.com@oselab-GUID.oslab.opentlc.com
 
 [bash-4.2$ ~] ssh root@192.168.0.100
-root@192.168.0.100's password: ******** (r3dh4t1!)
+root@192.168.0.100's password: ******** (provided)
 
 [root@master00-GUID ~]# su - david
 

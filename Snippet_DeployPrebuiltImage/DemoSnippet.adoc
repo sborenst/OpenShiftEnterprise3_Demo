@@ -39,7 +39,7 @@ link:Additional.Information.adoc[additional information] page?
 
 #From you administration host (oselab)
 [bash-4.2$ ~] ssh root@192.168.0.100
-root@192.168.0.100's password: ******** (r3dh4t1!)
+root@192.168.0.100's password: ******** (provided)
 
 # From the Master server (Master00)
 [root@master00-GUID ~]# su - david
@@ -47,7 +47,7 @@ root@192.168.0.100's password: ******** (r3dh4t1!)
 
 ----
 
-. *Action* - As user `david` log in to OpenShift (Password: *r3dh4t1!*)and select the `hello-openshift-demo` project.
+. *Action* - As user `david` log in to OpenShift (Password: *provided*)and select the `hello-openshift-demo` project.
 +
 ** *Caution* - If you have _already logged in_ to OpenShift Enterprise, _do not_ run the `oc login` command again. Because you are already logged in, this will result in an error on screen.
 ** *Explain* that you are currently logging in to the master as part of this demonstration, but consider that every command that `david` issues is a command that a developer would do on his or her laptop or workstation, or from wherever he or she is working.
@@ -56,7 +56,7 @@ root@192.168.0.100's password: ******** (r3dh4t1!)
 ----
 
 [david@master00~]$ oc login -u david --insecure-skip-tls-verify --server=https://master00-${GUID}.oslab.opentlc.com:8443
-(Password is: r3dh4t1!)
+(Password is: provided)
 
 ----
 

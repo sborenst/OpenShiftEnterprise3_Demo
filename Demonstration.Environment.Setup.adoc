@@ -108,11 +108,11 @@ time.
 .Example
 ----
 Laptop$ ssh -i ~/.ssh/mykey.key shacharb-redhat.com@oselab-c3po.oslab.opentlc.com
-(root password is: r3dh4t1!)
+(root password is: provided)
 ----
 
 . Once connected to *oselab*, test the connection to each server:
-.. use the same *root* password as before : *r3dh4t1!*, when prompted
+.. use the same *root* password as before : *provided*, when prompted
 +
 ----
 -bash-4.2$ ssh root@192.168.0.100
