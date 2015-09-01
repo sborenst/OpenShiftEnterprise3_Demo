@@ -38,7 +38,7 @@ In this scenario, David wants to deploy and test an application from an existing
 ** *Explain* that what you see here is a Git repository containing a sample Ruby application using the Sinatra Ruby Gem.
 
 ** *Optional* - Review the files briefly with the audience if you think it would help them understand.
-. *Action* - Browse to link:https://master00-GUID.oslab.opentlc.com:8443[https://master00-GUID.oslab.opentlc.com:8443] and log in using the `david` account with password `R3dh4t1!`
+. *Action* - Browse to link:https://master00-GUID.oslab.opentlc.com:8443[https://master00-GUID.oslab.opentlc.com:8443] and log in using the `david` account with the password provided
 +
 [NOTE]
 *GUID* in the URL refers to your Global Unique Identifier.
