@@ -10,7 +10,7 @@ toc::[]
 
 === Scenario
 
-In this scenario, David wants to deploy a two-tiered `Web-DB` application using an `Instant Apps` template.
+In this scenario, David wants to deploy a two-tiered "Web-DB" application using a template.
 
 
 === Before you begin

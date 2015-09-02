@@ -92,8 +92,9 @@ minutes for running the demo deployment script.
 * Read the _Legend_ and demonstration tips in the
 link:Additional.Information.adoc[additional information] page.
 * Pick a snippet from the available snippet list:
-- Snippet -
-link:Snippet_DeployPrebuiltImage/DemoSnippet.adoc[Deploy Application from a Docker Image and scale.]
-- Snippet
-- Snippet
-- Snippet
+- Snippet - link:Snippet_DeployPrebuiltImage/DemoSnippet.adoc[Deploy Application
+ from a Docker Image and scale.] (command line)
+- Snippet - link:Snippet_DeployS2I/DemoSnippet.adoc[Deploy Application
+ from Git repository Using S2I Build and scale.] (web console)
+- Snippet -  link:Snippet_DeployTemplate_2tier/DemoSnippet.adoc[Deploy a
+two-tiered application from a template] (web console and command line)
