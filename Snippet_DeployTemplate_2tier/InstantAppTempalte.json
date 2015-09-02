@@ -2,7 +2,7 @@
   "kind": "Template",
   "apiVersion": "v1",
   "metadata": {
-    "name": "instantapp-2tier-application",
+    "name": "demo-2tier-application",
     "creationTimestamp": null,
     "annotations": {
       "description": "This is an demonstration of a Ruby and MySQL application on OpenShift 3",
@@ -47,7 +47,7 @@
         "creationTimestamp": null
       },
       "spec": {
-        "host": "instantapp-demo.cloudapps-GUID.oslab.opentlc.com",
+        "host": "template-demo.cloudapps-GUID.oslab.opentlc.com",
         "to": {
           "kind": "Service",
           "name": "frontend"

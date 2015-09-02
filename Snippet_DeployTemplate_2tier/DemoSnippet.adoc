@@ -45,20 +45,42 @@ Remember that *GUID* in the URL refers to your Global Unique Identifier.
 *** You can create users locally or link to an enterprise directory.
 *** You can group users and create teams.
 *** You can use quotas to set resource limits on users, projects, and teams.
++
+====
+You can see a preview here: link:images/WebUI_Login.png[WebUI Login Preview]
+====
 
 . *Action* - Select the `Instant Apps Demonstration` project.
-. *Action* - Click the *Create* button.
-. *Action* Click `instantapp-2tier-application`.
-** *Explain* that you are now creating a new application from a template that was loaded in the OpenShift Enterprise environment.
++
+====
+You can see a preview here: link:images/WebUI_SelectProject.png[WebUI Select Project Preview]
+====
 
+. *Action* - Click the *Create* button.
++
+====
+You can see a preview here: link:images/WebUI_CreateButton.png[WebUI Create Button Preview]
+====
+. *Action* Click `demo-2tier-application`, in the list of templates.
+** *Explain* that you are now creating a new application from a template that was loaded in the OpenShift Enterprise environment.
+** *Point out* that this template was added only to this project and is not available for other projects, of course, you could add a template as "Public" and have it accessed by all users.
 . *Action* - Click the *Select Template* box.
 ** *Explain* that you need to review the images and edit the application attributes, such as labels and parameters.
 ** *Show* that you can set a label for the application to manage it by label.
 ** *Show* that parameters such as usernames and credentials are generated for each template, but you can also set them manually.
-
++
+====
+You can see a preview here: link:images/WebUI_TemplateInformation.png[WebUI Template Information Preview]
+====
 . *Action* - Click *Create*.
 ** *Explain* what is about to happen: Builds are getting started and services are being created for the front end and back end.
 . *Optional* - Select *Browse* on the left side of the screen and show the *Builds*, *Services*, and *Pods* panes.
+
+. *Action* - After the build is complete, Open link:http://frontend.instantapps-demo.cloudapps-guid.oslab.opentlc.com/[http://frontend.instantapps-demo.cloudapps-guid.oslab.opentlc.com/]
+
+NOTE: You can finish the demonstration here, if you want to show the command line you can continue to the next section.
+
+== Review the template in the command line (Optional)
 
 === Log In and Authenticate
 
@@ -75,7 +97,7 @@ root@192.168.0.100's password: ******** (provided)
 
 ----
 
-. *Action:* - As user `david`, log in to OpenShift Enterprise and select the `instantapps-demo` project.
+. *Action* - As user `david`, log in to OpenShift Enterprise and select the `instantapps-demo` project.
 +
 ** *Caution* - If you have _already logged in_ to OpenShift Enterprise, _do not_ run the `oc login` command again. You are already logged in, and this will result in an error on the screen.
 ** *Explain* that you are currently logging in to the master as part of this demonstration, but consider that every command that `david` issues is a command that the developer could do on his or her laptop or workstation, or from wherever he or she is working.
@@ -88,10 +110,8 @@ root@192.168.0.100's password: ******** (provided)
 . If you are not already using the *instantapps-demo* project, switch to it:
 +
 ----
-
 [david@master00~]$ oc project instantapps-demo
 Using project "instantapps-demo"
-
 ----
 
 
@@ -133,16 +153,25 @@ I0703 10:02:01.730922       1 sti.go:103] Successfully pushed 172.30.133.153:500
 ----
 
 
-
-. *Action* While you wait for the build to complete, expose the *service* and create the route for the application.
-* *CAUTION* Don't skip this step!, if you don't *expose* the service, the application will *NOT be accessible from the outside* world.
+. *Explain* While we wait for the build to complete, we can create an alias for our application.
+* *Action* - Use the *oc expose* command to create another `route` for the our application.
 ** *Explain* that in this scenario, you decided to add another route to your application, so it is available under another URL.
-** *Explain* that you are creating a route so that when a user resolves `myinstant.cloudapps-$GUID.oslab.opentlc.com`, you will "route" (actualy its more like "proxy") the user to one of the pods under the `frontend` service.
+** *Explain* that you are creating a route so that when a user resolves `myinstant.cloudapps-guid.oslab.opentlc.com`, you will "route" (actualy its more like "proxy") the user to one of the pods under the `frontend` service.
 +
 ----
 [david@master00~]$ oc expose service frontend --name=myinst-route --hostname=myinst.cloudapps-$GUID.oslab.opentlc.com
 ----
 
+. *Action* - Show the *routes* for the project using the *oc get routes* command
++
+----
+[david@master00~]$ oc get routes
+NAME            HOST/PORT                                                    PATH      SERVICE    LABELS
+example-route   frontend.instantapps-demo.cloudapps-c3po.oslab.opentlc.com             frontend   template=application-template-stibuild
+myinst-route    myinst.cloudapps-c3po.oslab.opentlc.com                                frontend   template=application-template-stibuild
+
+
+----
 
 
 . *Show* that the pods were all created, 2 for the *frontend* and 1 *database* backend.
@@ -166,14 +195,140 @@ database   template=application-template-stibuild   name=database   172.30.176.1
 frontend   template=application-template-stibuild   name=frontend   172.30.149.55    5432/TCP
 ----
 
+. *Show* that the two *deployments* have been created
++
+----
+[david@master00~]$ oc get dc
+NAME       TRIGGERS                    LATEST VERSION
+database   ConfigChange                1
+frontend   ConfigChange, ImageChange   1
+----
 
+=== Complete the Command Line Demonstration
 
-=== Complete the Demonstration
-
-. *Action* - Browse to: link:http://instantapp-demo.cloudapps-$GUID.oslab.opentlc.com[instantapp.cloudapps-$GUID.oslab.opentlc.com].
+. *Action* - Browse to: link:http://myinst.cloudapps-guid.oslab.opentlc.com[myinst.cloudapps-GUID.oslab.opentlc.com].
 ** *Explain* what you did, and that this is a very common workflow for every development environment.
 ** *Point out* the following:
 *** You created a Ruby front end and a database backend.
 *** Using the template, both parts of the application environment can share values like usernames and passwords.
 *** You can randomize and generate values for each template.
 *** You created a route to direct to the front end service.
+
+== Scaling up the template (Optional)
+
+=== Show how to increase the replicas of the deployed pods.
+
+. *Action* - Run the following command.
+.. *Explain* the role of the DC (`DeploymentConfig`)
+.. *Point Out:*
+- Triggers - What makes the DC redeploy the pods
+- Replicas - How many replicas are required of this pod - This is where we will make a permanent change to an environment
+
+----
+
+[david@master00 ~]$  oc describe dc frontend
+Name:           frontend
+Created:        39 minutes ago
+Labels:         template=application-template-stibuild
+Latest Version: 1
+Triggers:       Image(ruby-sample@latest, auto=true), Config
+Strategy:       Recreate
+Template:
+        Selector:       name=frontend
+        Replicas:       2
+        Containers:
+                NAME            IMAGE                                                                                                                   ENV
+                ruby-helloworld 172.30.198.41:5000/instantapps-demo/ruby-sample@sha256:1ac706189796259481c5058d6c4540bbd7e3c08279a54960b049479882972250 ADMIN_PASSWORD=QMETygi6,ADMIN_USERNAME=admin8JL,MYSQL_DATABASE=root,MYSQL_PASSWORD=W0lQHFKY,MYSQL_USER=user8IV
+Deployment #1 (latest):
+        Name:           frontend-1
+        Created:        35 minutes ago
+        Status:         Complete
+        Replicas:       2 current / 2 desired
+        Selector:       deployment=frontend-1,deploymentconfig=frontend,name=frontend
+        Labels:         openshift.io/deployment-config.name=frontend,template=application-template-stibuild
+        Pods Status:    2 Running / 0 Waiting / 0 Succeeded / 0 Failed
+No events.
+
+
+----
+
+
+. *Action* - Run the following command.
+.. *Action* - Use the *oc scale* command to increase the *replica* count of the deployment pods from 1 to 10.
+.. *Explain* By changing the DeploymentConfig we are raising the "desired state" of the replica count from 1 to 10, this will result in immediate change.
+.. *Note* How efficient OpenShift 3 is, the output of the *oc scale* command is the simple and concise *"scaled"*
+
+----
+
+[david@master00~]$ oc scale dc frontend --replicas=10
+scaled
+----
+
+. *Action* - Run the following commands to show the the new replicas that were created and that the service has updated with the new pods.
+.. *Explain* that new pods are created by the RC the next time it syncs with the desired state defined in the DC
+...*Explain* The Service will be updated with the new pod names as they appear.
+
+----
+[david@master00~]$ oc get pods -w
+NAME                        READY     REASON       RESTARTS   AGE
+database-1-35tpq            1/1       Running      0          41m
+frontend-1-0zri2            1/1       Running      0          25s
+frontend-1-5pmmc            0/1       Pending      0          25s
+frontend-1-b94xp            1/1       Running      0          26s
+frontend-1-e8cb4            1/1       Running      0          37m
+frontend-1-kumxt            1/1       Running      0          26s
+frontend-1-kvwgj            1/1       Running      0          37m
+frontend-1-rkc9h            0/1       Pending      0          25s
+frontend-1-umwjt            0/1       Pending      0          25s
+frontend-1-vc0jf            0/1       Pending      0          25s
+frontend-1-vhgam            1/1       Running      0          25s
+ruby-sample-build-1-build   0/1       ExitCode:0   0          40m
+
+----
+
+. *Action* Use the *oc describe* command to display the service.
+.. *Explain* That the service is automatically listing all the new pods that have the label: *"name=hello-openshift"*
++
+----
+[david@master00~]$ oc describe service frontend
+Name:                   frontend
+Labels:                 template=application-template-stibuild
+Selector:               name=frontend
+Type:                   ClusterIP
+IP:                     172.30.182.104
+Port:                   web     5432/TCP
+Endpoints:              10.1.2.11:8080,10.1.2.12:8080,10.1.2.13:8080 + 7 more...
+Session Affinity:       None
+No events.
+
+----
+
+. *Optional Action* - If you have a room full of syntax geeks you can show this example of getting the pods to display with their nodes and ips
+.. *Explain* that we can use edit the `template` of our output on the fly and call on different attributes in the object
++
+----
+[david@master00-f4fc ~]$ oc get pod -t '{{range .items}}{{.metadata.name}}| {{.status.phase}} | {{.spec.host}} | {{.status.podIP}} {{"\n"}}{{end}}'
+
+database-1-35tpq| Running | node00-c3po.oslab.opentlc.com | 10.1.2.10
+frontend-1-0zri2| Running | node01-c3po.oslab.opentlc.com | 10.1.3.16
+frontend-1-5pmmc| Running | node00-c3po.oslab.opentlc.com | 10.1.2.15
+frontend-1-b94xp| Running | node01-c3po.oslab.opentlc.com | 10.1.3.15
+frontend-1-e8cb4| Running | node00-c3po.oslab.opentlc.com | 10.1.2.11
+frontend-1-kumxt| Running | node00-c3po.oslab.opentlc.com | 10.1.2.12
+frontend-1-kvwgj| Running | node01-c3po.oslab.opentlc.com | 10.1.3.14
+frontend-1-rkc9h| Running | node00-c3po.oslab.opentlc.com | 10.1.2.14
+frontend-1-umwjt| Running | node01-c3po.oslab.opentlc.com | 10.1.3.17
+frontend-1-vc0jf| Running | node01-c3po.oslab.opentlc.com | 10.1.3.18
+frontend-1-vhgam| Running | node00-c3po.oslab.opentlc.com | 10.1.2.13
+ruby-sample-build-1-build| Succeeded | node01-c3po.oslab.opentlc.com | 10.1.3.11
+
+
+----
+
+=== Complete the Command Line Demonstration
+
+** *Explain* what you did, and that this is a very common workflow for every development environment.
+** *Point out* the following:
+- Using a Tempalte, we created two "deployments", one based on a MySQL image and another an, S2I build from our Git repository.
+- The Template created 2 services, "frontend" and "backend".
+- With a single command we can scale up our application within seconds.

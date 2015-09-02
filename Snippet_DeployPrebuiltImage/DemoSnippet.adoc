@@ -46,7 +46,7 @@ root@192.168.0.100's password: ******** (provided)
 [david@master00-GUID ~]$ #you're in
 
 ----
-
+NOTE: user "david" not found? You probably missed the ""
 . *Action* - As user `david` log in to OpenShift (Password: *provided*)and select the `hello-openshift-demo` project.
 +
 ** *Caution* - If you have _already logged in_ to OpenShift Enterprise, _do not_ run the `oc login` command again. Because you are already logged in, this will result in an error on screen.
@@ -87,6 +87,7 @@ Now using project "hello-openshift-demo" on server "https://master00-8675.oslab.
 
 === Define the Pod
 
+
 Here you define the pod, but not the service, replication controllers, or routes.
 
 . *Show* the `hello-openshift-podonly.json` file.
@@ -96,59 +97,15 @@ Here you define the pod, but not the service, replication controllers, or routes
 *** `image` - This is the container image that this pod is running. This can be a local registry or an external one (like `docker.io`).
 *** `ports` - These are the ports that the Docker container exposes. Your code and application need to listen on those ports as well.
 *** `labels` - This is perhaps the most important component. Labels are "tags" that you apply, so that you can refer to a group of resources (pods, services, and so on).
-+
+
+
+
 [source,json]
 ----
-
-[david@master00]$ cat hello-openshift-pod.json
-{
-  "kind": "Pod",
-  "apiVersion": "v1",
-  "metadata": {
-    "name": "hello-openshift",
-    "creationTimestamp": null,
-    "labels": {
-      "name": "hello-openshift"
-    }
-  },
-  "spec": {
-    "containers": [
-      {
-        "name": "hello-openshift",
-        "image": "openshift/hello-openshift:latest",
-        "ports": [
-          {
-            "hostPort": 36061,
-            "containerPort": 8080,
-            "protocol": "TCP"
-          }
-        ],
-        "resources": {
-          "limits": {
-            "cpu": "10m",
-            "memory": "16Mi"
-          }
-        },
-        "terminationMessagePath": "/dev/termination-log",
-        "imagePullPolicy": "IfNotPresent",
-        "capabilities": {},
-        "securityContext": {
-          "capabilities": {},
-          "privileged": false
-        },
-        "nodeSelector": {
-          "region": "primary"
-        }
-      }
-    ],
-    "restartPolicy": "Always",
-    "dnsPolicy": "ClusterFirst",
-    "serviceAccount": ""
-  },
-  "status": {}
-}
-
+[david@master00~]$ cat hello-openshift-pod.json
+include::hello-openshift-pod.json[]
 ----
+
 
 === Create the Pod
 
@@ -254,114 +211,7 @@ You should understand every line in the file in case the audience asks questions
 ----
 
 [david@master00~]$ cat hello-openshift-complete.json
-{
-  "kind": "List",
-  "apiVersion": "v1",
-  "metadata": {
-    "name": "hello-openshift-complete-example"
-  },
-  "items": [
-    {
-      "kind": "Service",
-      "apiVersion": "v1",
-      "metadata": {
-        "name": "hello-openshift-service"
-      },
-      "spec": {
-        "selector": {
-          "name": "hello-openshift"
-        },
-        "ports": [
-          {
-            "protocol": "TCP",
-            "port": 27017,
-            "targetPort": 8080
-          }
-        ]
-      }
-    },
-    {
-      "kind": "Route",
-      "apiVersion": "v1",
-      "metadata": {
-        "name": "hello-openshift-route"
-      },
-      "spec": {
-        "host": "hello-openshift.cloudapps-GUID.oslab.opentlc.com",
-        "to": {
-          "name": "hello-openshift-service"
-        },
-        "tls": {
-          "termination": "edge"
-        }
-      }
-    },
-    {
-      "kind": "DeploymentConfig",
-      "apiVersion": "v1",
-      "metadata": {
-        "name": "hello-openshift"
-      },
-      "spec": {
-        "strategy": {
-          "type": "Recreate",
-          "resources": {}
-        },
-        "triggers": [
-          {
-            "type": "ConfigChange"
-          }
-        ],
-        "replicas": 1,
-        "selector": {
-          "name": "hello-openshift"
-        },
-        "template": {
-          "metadata": {
-            "creationTimestamp": null,
-            "labels": {
-              "name": "hello-openshift"
-            }
-          },
-          "spec": {
-            "containers": [
-              {
-                "name": "hello-openshift",
-                "image": "openshift/hello-openshift:v0.4.3",
-                "ports": [
-                  {
-                    "name": "hello-openshift-tcp-8080",
-                    "containerPort": 8080,
-                    "protocol": "TCP"
-                  }
-                ],
-                "resources": {
-                  "limits": {
-                    "cpu": "10m",
-                    "memory": "16Mi"
-                  }
-                },
-                "livenessProbe": {
-                  "tcpSocket": {
-                    "port": 8080
-                  },
-                  "timeoutSeconds": 1,
-                  "initialDelaySeconds": 10
-                }
-              }
-            ],
-            "restartPolicy": "Always",
-            "dnsPolicy": "ClusterFirst",
-            "serviceAccount": "",
-            "nodeSelector": {
-              "region": "primary"
-            }
-          }
-        }
-      }
-    }
-  ]
-}
+include::hello-openshift-complete.json[]
 
 ----
 
@@ -411,10 +261,10 @@ Hello OpenShift!
 === Optional - Show how to increase the replicas of the deployed pods.
 
 . *Action* - Run the following command.
-.. *Explain the role of the DC (DeploymentConfig)
+.. *Explain* the role of the DC (`DeploymentConfig`)
 .. *Point Out:*
-... Triggers - What makes the DC redeploy the pods
-... Replicas - How many replicas are required of this pod - This is where we will make a permanent change to an environment
+- Triggers - What makes the DC redeploy the pods
+- Replicas - How many replicas are required of this pod - This is where we will make a permanent change to an environment
 
 ----
 
