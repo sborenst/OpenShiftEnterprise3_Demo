@@ -25,22 +25,6 @@
       }
     },
     {
-      "kind": "Route",
-      "apiVersion": "v1",
-      "metadata": {
-        "name": "hello-openshift-route"
-      },
-      "spec": {
-        "host": "hello-openshift-demo.cloudapps-GUID.oslab.opentlc.com",
-        "to": {
-          "name": "hello-openshift-service"
-        },
-        "tls": {
-          "termination": "edge"
-        }
-      }
-    },
-    {
       "kind": "DeploymentConfig",
       "apiVersion": "v1",
       "metadata": {
@@ -71,7 +55,7 @@
             "containers": [
               {
                 "name": "hello-openshift",
-                "image": "openshift/hello-openshift:v0.4.3",
+                "image": "openshift/hello-openshift:v1.0.6",
                 "ports": [
                   {
                     "name": "hello-openshift-tcp-8080",
