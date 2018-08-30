@@ -48,7 +48,7 @@ demo snippets:
 
 = Environment Setup
 
-This Demonstration is designed to work the the *Red Hat Product Demo System*
+This Demonstration is designed to work with the *Red Hat Product Demo System*
 (link:https://rhpds.redhat.com[]). +
 
 NOTE: It is assumed that you have OPENTLC credentials to access the *RHPDS*
